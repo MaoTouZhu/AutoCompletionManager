@@ -13,26 +13,26 @@ try
 
     //DirectoryInfo debugDir = new DirectoryInfo(@"/mnt/MagNet_Portable_HDD_1T/智赛/耦合项目/耦合Dome机/bin/Debug");
     //DirectoryInfo debugDir = new DirectoryInfo(@"C:\Users\Lenovo\Desktop\智赛\耦合项目\耦合Dome机\bin\Debug");
-    DirectoryInfo debugDir = new DirectoryInfo(System.Environment.CurrentDirectory).Parent;
+    DirectoryInfo debugDir = new DirectoryInfo(System.Environment.CurrentDirectory).Parent!;
 
-    if (debugDir.Exists == false)
+    if (debugDir!.Exists == false)
     {
-        System.Console.WriteLine(debugDir.FullName);
+        Console.WriteLine("找不到调试目录");
         goto end;
     }
 
     DirectoryInfo projectsHomeDir = new DirectoryInfo(Path.Combine(debugDir.FullName, "Projects"));
     if (projectsHomeDir.Exists == false)
     {
-        System.Console.WriteLine(projectsHomeDir.FullName);
+        Console.WriteLine($"找不到项目目录: {projectsHomeDir.FullName}");
         goto end;
     }
- 
+
 
     FileInfo mainConfigFile = new FileInfo(Path.Combine(debugDir.FullName, "Config.xml"));
     if (mainConfigFile.Exists == false)
     {
-        System.Console.WriteLine(mainConfigFile.FullName);
+        Console.WriteLine($"找不到配置文件: {mainConfigFile.FullName}");
         goto end;
     }
 
@@ -40,20 +40,29 @@ try
 
     var line = ReadAllLines(mainConfigFile.FullName, Encoding.GetEncoding("gb2312")).FirstOrDefault(l => l.Contains("活动工程名称"));
     if (line is null)
-        return;
+    {
+        Console.WriteLine($"在配置文件中找不到活动工程名称: {mainConfigFile.FullName}");
+        goto end;
+    }
 
     Regex regex = new Regex(@"<ProjectName[^>]*>(.*?)</ProjectName>");
     Match match = regex.Match(line);
 
     if (match.Success == false || match.Groups.Count < 1)
-        return;
+    {
+        Console.WriteLine($"在配置文件中找不到活动工程名称: {mainConfigFile.FullName}");
+        goto end;
+    }
 
     string projectName = match.Groups[1].Value;
 
 
     DirectoryInfo projectDir = new DirectoryInfo(Path.Combine(projectsHomeDir.FullName, projectName));
     if (projectDir.Exists == false)
-        return;
+    {
+        Console.WriteLine($"找不到项目目录: {projectDir.FullName}");
+        goto end;
+    }
 
 
     string tab = "&#9;";
@@ -62,7 +71,7 @@ try
     List<string> oneLineItems = new List<string>();
 
 
-    string file;
+    string file = string.Empty;
     try
     {
         file = Path.Combine(projectDir.FullName, "Alarm", "Alarm.mgr");
@@ -79,7 +88,10 @@ try
             oneLineItems.AddRange(allInfo.Select(t => $"alarm#{t.key}{tab}'{t.msg}"));
         }
     }
-    catch { }
+    catch(Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     IEnumerable<(string key, string name)> axisKeyName = Enumerable.Empty<(string key, string name)>();
@@ -103,7 +115,10 @@ try
             oneLineItems.AddRange(allInfo.Select(t => $"axis-{t.tag}{tab}'{t.name}"));
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     try
@@ -118,7 +133,10 @@ try
             oneLineItems.AddRange(allInfo.Select(i => $"Comm[{i.key}]{tab}'{i.name}"));
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     try
@@ -135,7 +153,10 @@ try
             oneLineItems.AddRange(allInfo.Select(i => "cc-" + i.name));
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     try
@@ -164,7 +185,10 @@ try
             }
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
 
@@ -194,7 +218,10 @@ try
             }
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
 
@@ -235,7 +262,10 @@ try
             }
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
 
@@ -256,7 +286,10 @@ try
             oneLineItems.AddRange(allInfo.Select(t => $"ff-#{t.key}{tab}'{t.msg}"));
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
 
@@ -276,7 +309,10 @@ try
             oneLineItems.AddRange(allData.Select(d => $"para-{d[0]}{tab}'{d[1]}"));
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     List<(string name, string[]? para, string? note)> functions = new List<(string name, string[]? para, string? note)>();
@@ -368,7 +404,10 @@ try
 
         }
     }
-    catch { }
+    catch (Exception e)
+    {
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+    }
 
 
     List<(string key, string note)> vars = new List<(string key, string note)>();
@@ -385,12 +424,12 @@ try
        .Select(i => (key: i.First(), note: i.Skip(1).First()))
        .ToList();
 
-    var defs = 
+    var defs =
     allLines
         .Where(l => l.Trim().StartsWith("'def "))
        .Select(l => l.Trim().Replace("'def ", ""));
     oneLineItems.AddRange(defs);
-    oneLineItems.AddRange(defs.Select(t=>$"def-{t}"));
+    oneLineItems.AddRange(defs.Select(t => $"def-{t}"));
 
 
     oneLineItems.AddRange(vars.Select(v => $"{v.key}"));
@@ -463,52 +502,52 @@ try
 }
 catch (Exception e)
 {
-    System.Console.WriteLine(e.ToString());
+    Console.WriteLine(e.ToString());
 }
 
 if (File.Exists("notepad++.exe"))
 {
     Process[] processes = Process.GetProcessesByName("notepad++");
 
-            if (processes.Length > 0)
-            {
-                Console.WriteLine($"正在重启notepad++...");
-                foreach (var p in processes)
-                {
-                    p.Kill();           // 强制结束进程
-                    p.WaitForExit();    // 等待进程完全退出
-                }
-            }
-            else
-            {
-                Console.WriteLine("未找到 Notepad++ 进程。");
-            }
+    if (processes.Length > 0)
+    {
+        Console.WriteLine($"正在重启notepad++...");
+        foreach (var p in processes)
+        {
+            p.Kill();           // 强制结束进程
+            p.WaitForExit();    // 等待进程完全退出
+        }
+    }
+    else
+    {
+        Console.WriteLine("未找到 Notepad++ 进程。");
+    }
 
-            System.Console.WriteLine("");
-            System.Console.WriteLine("axis-轴");
-            System.Console.WriteLine("struct-结构体");
-            System.Console.WriteLine("alarm-报警");
-            System.Console.WriteLine("form-弹窗\tff-弹窗");
-            System.Console.WriteLine("para-配置, 界面上的配置");
-            System.Console.WriteLine("cylinder-气缸\tcc-气缸");
-            System.Console.WriteLine("point-点位\tPP-点位");
-            System.Console.WriteLine("var-自定义变量, 定义格式如下, 在任意代码程序中声明, 但是建议还是放在comm中.");
-            System.Console.WriteLine("\t'var #1000 = 变量名称");
-            
-            System.Console.WriteLine("def-自定义字段, 定义格式如下, 在任意代码程序中声明");
-            System.Console.WriteLine("\t'def 任意的文字,但是不要包含空格,例如一些代码片段或者是说明书");
+    Console.WriteLine("");
+    Console.WriteLine("axis-轴");
+    Console.WriteLine("struct-结构体");
+    Console.WriteLine("alarm-报警");
+    Console.WriteLine("form-弹窗\tff-弹窗");
+    Console.WriteLine("para-配置, 界面上的配置");
+    Console.WriteLine("cylinder-气缸\tcc-气缸");
+    Console.WriteLine("point-点位\tPP-点位");
+    Console.WriteLine("var-自定义变量, 定义格式如下, 在任意代码程序中声明, 但是建议还是放在comm中.");
+    Console.WriteLine("\t'var #1000 = 变量名称");
 
-            System.Console.WriteLine("");
-            System.Console.WriteLine("按任意键继续...");
-            System.Console.ReadKey();
+    Console.WriteLine("def-自定义字段, 定义格式如下, 在任意代码程序中声明");
+    Console.WriteLine("\t'def 任意的文字,但是不要包含空格,例如一些代码片段或者是说明书");
 
-            string notepadPath = @"notepad++.exe";
-            Process.Start(notepadPath);
+    Console.WriteLine("");
+    Console.WriteLine("按任意键继续...");
+    Console.ReadKey();
+
+    string notepadPath = @"notepad++.exe";
+    Process.Start(notepadPath);
 }
 
 
 end:
-System.Console.WriteLine("end");
+Console.WriteLine("end");
 
 
 
