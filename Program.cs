@@ -90,7 +90,7 @@ try
     }
     catch(Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -117,7 +117,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -135,7 +135,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -155,7 +155,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -187,7 +187,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -220,7 +220,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -264,7 +264,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -288,7 +288,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -306,12 +306,12 @@ try
 
             oneLineItems.AddRange(allData.Select(d => $"{d[0]}"));
             oneLineItems.AddRange(allData.Select(d => $"{d[0]}{tab}'{d[1]}（配置）"));
-            oneLineItems.AddRange(allData.Select(d => $"para-{d[0]}{tab}'{d[1]}"));
+            oneLineItems.AddRange(allData.Select(d => $"config-{d[0]}{tab}'{d[1]}"));
         }
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -406,7 +406,7 @@ try
     }
     catch (Exception e)
     {
-        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString}");
+        Console.WriteLine($"处理文件时出错: {file}\r\n{e.ToString()}");
     }
 
 
@@ -528,7 +528,7 @@ if (File.Exists("notepad++.exe"))
     Console.WriteLine("struct-结构体");
     Console.WriteLine("alarm-报警");
     Console.WriteLine("form-弹窗\tff-弹窗");
-    Console.WriteLine("para-配置, 界面上的配置");
+    Console.WriteLine("config-配置, 界面上的配置");
     Console.WriteLine("cylinder-气缸\tcc-气缸");
     Console.WriteLine("point-点位\tPP-点位");
     Console.WriteLine("var-自定义变量, 定义格式如下, 在任意代码程序中声明, 但是建议还是放在comm中.");
@@ -543,12 +543,14 @@ if (File.Exists("notepad++.exe"))
 
     string notepadPath = @"notepad++.exe";
     Process.Start(notepadPath);
+    return;
 }
 
 
 end:
 Console.WriteLine("end");
-
+Console.WriteLine("按任意键继续...");
+Console.ReadKey();
 
 
 static string ReadAllText(string path, Encoding? enc = null)
